@@ -1,0 +1,4 @@
+# source clips live in the repo root; prepare.sh copies them here
+assets/video/
+snapshots/
+node_modules/

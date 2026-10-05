@@ -1,0 +1,655 @@
+<!doctype html>
+<html lang="en" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <script src="assets/vendor/gsap.min.js"></script>
+    <style>
+      @font-face {
+        font-family: "Montserrat";
+        src: url("assets/fonts/Montserrat-latin.woff2") format("woff2");
+        font-weight: 100 900;
+        font-style: normal;
+      }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        margin: 0;
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #0b1622;
+      }
+      :root {
+        --blue: #0092d8;
+        --blue-text: #005f96;
+        --green: #5cb128;
+        --green-text: #3f8a1c;
+        --navy: #0b1622;
+        --paper: #fbfcfa;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        background: var(--navy);
+        font-family: "Montserrat", sans-serif;
+        color: var(--navy);
+        overflow: hidden;
+      }
+
+      /* ---------- video scenes ---------- */
+      .scene {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        z-index: 1;
+        opacity: 0;
+      }
+      .scene video {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        object-fit: cover;
+      }
+
+      /* ---------- overlays ---------- */
+      .overlay {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        z-index: 5;
+      }
+
+      /* scene 1: calendar chip (upper-left corner, clear of the face) */
+      #cal {
+        position: absolute;
+        left: 24px;
+        top: 130px;
+        width: 366px;
+        background: var(--paper);
+        border-radius: 22px;
+        overflow: hidden;
+        box-shadow: 0 10px 28px rgba(11, 22, 34, 0.35);
+      }
+      #cal .band {
+        background: var(--blue-text);
+        color: #fff;
+        font-size: 27px;
+        font-weight: 700;
+        line-height: 1.2;
+        text-align: center;
+        padding: 12px 10px 11px;
+        letter-spacing: 0.02em;
+      }
+      #cal .band span {
+        display: block;
+      }
+      #cal .date {
+        font-size: 42px;
+        font-weight: 800;
+        text-align: center;
+        padding: 14px 6px 16px;
+        color: var(--navy);
+        white-space: nowrap;
+      }
+      #cal .rule {
+        height: 7px;
+        background: var(--green);
+      }
+
+      /* chip rows (scenes 2 and 3) */
+      .chips {
+        position: absolute;
+        left: 40px;
+        top: 1110px;
+        width: 1000px;
+        height: 170px;
+      }
+      .chip {
+        position: absolute;
+        top: 0;
+        width: 316px;
+        height: 170px;
+        background: var(--paper);
+        border-radius: 26px;
+        box-shadow: 0 10px 28px rgba(11, 22, 34, 0.35);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        padding: 0 8px;
+      }
+      .chip .ico {
+        width: 64px;
+        height: 64px;
+        border-radius: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+      }
+      .chip .ico svg {
+        width: 38px;
+        height: 38px;
+      }
+      .chip .ico.b {
+        background: var(--blue);
+      }
+      .chip .ico.g {
+        background: var(--green-text);
+      }
+      .chip .lbl {
+        font-size: 37px;
+        font-weight: 700;
+        line-height: 1.1;
+        text-align: center;
+        color: var(--navy);
+      }
+
+      /* scene 2: locked-in notice */
+      #locked {
+        position: absolute;
+        left: 40px;
+        top: 1110px;
+        width: 1000px;
+        height: 170px;
+        background: var(--paper);
+        border-radius: 26px;
+        border-left: 14px solid var(--blue-text);
+        box-shadow: 0 10px 28px rgba(11, 22, 34, 0.35);
+        align-items: center;
+        padding: 0 40px 0 34px;
+        font-size: 45px;
+        font-weight: 700;
+        line-height: 1.2;
+        color: var(--navy);
+        display: none;
+      }
+      #locked em {
+        font-style: normal;
+        color: var(--blue-text);
+      }
+
+      /* scene 3: tap prompt */
+      #tap {
+        position: absolute;
+        left: 0;
+        top: 1530px;
+        width: 1080px;
+        height: 190px;
+      }
+      #tap .txt {
+        position: absolute;
+        left: 190px;
+        top: 0;
+        width: 700px;
+        height: 84px;
+        border-radius: 42px;
+        background: rgba(11, 22, 34, 0.9);
+        color: #fff;
+        font-size: 46px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+      }
+      #tap .txt b {
+        color: var(--green);
+        font-weight: 800;
+        margin: 0 0.25em;
+      }
+      #tap .arrow {
+        position: absolute;
+        left: 504px;
+        top: 100px;
+        width: 72px;
+        height: 72px;
+        border-radius: 36px;
+        background: rgba(11, 22, 34, 0.9);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #tap .arrow svg {
+        width: 44px;
+        height: 44px;
+      }
+
+      /* ---------- captions ---------- */
+      #captions {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        z-index: 10;
+        pointer-events: none;
+      }
+      .capwrap {
+        position: absolute;
+        left: 0;
+        top: 1356px;
+        width: 1080px;
+        display: flex;
+        justify-content: center;
+        opacity: 0;
+      }
+      .cap {
+        display: inline-flex;
+        gap: 0.28em;
+        background: rgba(11, 22, 34, 0.86);
+        border-radius: 44px;
+        padding: 20px 40px 22px;
+        font-size: 62px;
+        font-weight: 700;
+        color: #fff;
+        white-space: nowrap;
+      }
+      .cap .w {
+        display: inline-block;
+        opacity: 0;
+      }
+      .cap .w.hl {
+        color: var(--green);
+      }
+
+      /* ---------- final CTA card ---------- */
+      #cta {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 1080px;
+        height: 1920px;
+        z-index: 20;
+        background: var(--navy);
+        opacity: 0;
+      }
+      #cta .bar {
+        position: absolute;
+        left: 0;
+        top: 124px;
+        width: 1080px;
+        height: 10px;
+        background: linear-gradient(90deg, var(--blue) 0%, var(--blue) 50%, var(--green) 50%, var(--green) 100%);
+      }
+      #cta .plate {
+        position: absolute;
+        left: 190px;
+        top: 168px;
+        width: 700px;
+        height: 262px;
+        background: var(--paper);
+        border-radius: 30px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      #cta .plate img {
+        width: 636px;
+        height: 212px;
+        display: block;
+      }
+      #cta .head {
+        position: absolute;
+        left: 20px;
+        top: 466px;
+        width: 1040px;
+        text-align: center;
+        font-size: 118px;
+        font-weight: 800;
+        line-height: 1.1;
+        color: #fff;
+      }
+      #cta .head span {
+        display: block;
+      }
+      #cta .head .free {
+        color: var(--green);
+      }
+      #cta .sub {
+        position: absolute;
+        left: 20px;
+        top: 878px;
+        width: 1040px;
+        text-align: center;
+        font-size: 48px;
+        font-weight: 700;
+        color: var(--green);
+      }
+      #cta .btn {
+        position: absolute;
+        left: 70px;
+        top: 984px;
+        width: 940px;
+        height: 180px;
+        border-radius: 88px;
+        background: var(--green);
+        color: var(--navy);
+        font-size: 60px;
+        font-weight: 800;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        white-space: nowrap;
+        box-shadow: 0 14px 34px rgba(92, 177, 40, 0.28);
+      }
+      #cta .btn b {
+        font-weight: 800;
+        margin: 0 0.28em;
+      }
+      #cta .down {
+        position: absolute;
+        left: 504px;
+        top: 1182px;
+        width: 72px;
+        height: 72px;
+      }
+      #cta .down svg {
+        width: 72px;
+        height: 72px;
+      }
+      #cta .rchip {
+        position: absolute;
+        height: 78px;
+        border-radius: 39px;
+        background: rgba(255, 255, 255, 0.1);
+        border: 2px solid rgba(255, 255, 255, 0.22);
+        color: #fff;
+        font-size: 38px;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 0 30px 0 18px;
+        white-space: nowrap;
+      }
+      #cta .rchip i {
+        width: 44px;
+        height: 44px;
+        border-radius: 22px;
+        background: var(--green);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+      }
+      #cta .rchip i svg {
+        width: 26px;
+        height: 26px;
+      }
+      #cta .call {
+        position: absolute;
+        left: 20px;
+        top: 1516px;
+        width: 1040px;
+        text-align: center;
+        font-size: 40px;
+        font-weight: 600;
+        color: #d3dde6;
+      }
+      #cta .call b {
+        color: #fff;
+        font-weight: 800;
+      }
+      #cta .disc {
+        position: absolute;
+        left: 90px;
+        top: 1618px;
+        width: 900px;
+        text-align: center;
+        font-size: 26px;
+        font-weight: 500;
+        line-height: 1.38;
+        color: #a9bacb;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-start="0"
+      data-duration="36"
+      data-width="1080"
+      data-height="1920"
+    >
+      <!-- ============ SCENE 1 ============ -->
+      <div class="scene" id="sc1">
+        <video id="v1" class="clip" src="assets/video/scene1.mp4" data-start="0" data-duration="10" data-track-index="0" data-has-audio="true" playsinline></video>
+      </div>
+      <!-- ============ SCENE 2 ============ -->
+      <div class="scene" id="sc2">
+        <video id="v2" class="clip" src="assets/video/scene2.mp4" data-start="10.5" data-duration="10" data-track-index="0" data-has-audio="true" playsinline></video>
+      </div>
+      <!-- ============ SCENE 3 ============ -->
+      <div class="scene" id="sc3">
+        <video id="v3" class="clip" src="assets/video/scene3.mp4" data-start="21" data-duration="10" data-track-index="0" data-has-audio="true" playsinline></video>
+      </div>
+
+      <!-- Scene 1 graphic -->
+      <div class="overlay clip" id="ov1" data-start="0" data-duration="10" data-track-index="1">
+        <div id="cal">
+          <div class="band"><span>Medicare Annual</span><span>Enrollment</span></div>
+          <div class="date">Oct 15 – Dec 7</div>
+          <div class="rule"></div>
+        </div>
+      </div>
+
+      <!-- Scene 2 graphics -->
+      <div class="overlay clip" id="ov2" data-start="10.5" data-duration="10" data-track-index="1">
+        <div class="chips" id="chips2">
+          <div class="chip" id="c2a" style="left: 0">
+            <div class="ico b">
+              <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><path d="M8 8H24L42 26L26 42L8 24Z"/><circle cx="17" cy="17" r="3" fill="#fff" stroke="none"/></svg>
+            </div>
+            <div class="lbl">Costs</div>
+          </div>
+          <div class="chip" id="c2b" style="left: 342px">
+            <div class="ico b">
+              <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle cx="21" cy="15" r="7"/><path d="M7 41C7 32 13 27 21 27C29 27 35 32 35 41"/><path d="M38 8V20M32 14H44"/></svg>
+            </div>
+            <div class="lbl">Doctors</div>
+          </div>
+          <div class="chip" id="c2c" style="left: 684px">
+            <div class="ico b">
+              <svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="4" stroke-linejoin="round" stroke-linecap="round"><g transform="rotate(-45 24 24)"><rect x="5" y="16" width="38" height="16" rx="8"/><path d="M24 16V32"/><path d="M24 16H35A8 8 0 0 1 35 32H24Z" fill="#fff" stroke="none"/></g></svg>
+            </div>
+            <div class="lbl">Prescriptions</div>
+          </div>
+        </div>
+        <div id="locked">
+          <div>After Dec 7, you're <em>usually locked in</em> until next year</div>
+        </div>
+      </div>
+
+      <!-- Scene 3 graphics -->
+      <div class="overlay clip" id="ov3" data-start="21" data-duration="10" data-track-index="1">
+        <div class="chips" id="chips3">
+          <div class="chip" id="c3a" style="left: 0">
+            <div class="ico g"><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 25L20 34L37 14"/></svg></div>
+            <div class="lbl">Free review</div>
+          </div>
+          <div class="chip" id="c3b" style="left: 342px">
+            <div class="ico g"><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 25L20 34L37 14"/></svg></div>
+            <div class="lbl">Takes a few minutes</div>
+          </div>
+          <div class="chip" id="c3c" style="left: 684px">
+            <div class="ico g"><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 25L20 34L37 14"/></svg></div>
+            <div class="lbl">No obligation</div>
+          </div>
+        </div>
+        <div id="tap">
+          <div class="txt">Tap<b>Learn More</b>below</div>
+          <div class="arrow" id="tapArrow">
+            <svg viewBox="0 0 48 48" fill="none" stroke="#5cb128" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 7V38M11 26L24 39L37 26"/></svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Captions (built from the data below) -->
+      <div id="captions" class="clip" data-start="0" data-duration="36" data-track-index="2"></div>
+
+      <!-- Final call-to-action card -->
+      <div id="cta" class="clip" data-start="31" data-duration="5" data-track-index="3">
+        <div class="bar"></div>
+        <div class="plate"><img src="assets/img/logo.png" alt="Allen &amp; Associates Insurance Agency — Making Medicare Easy" /></div>
+        <div class="head">
+          <span>Get your <span class="free" style="display: inline">FREE</span></span>
+          <span>Medicare plan</span>
+          <span>review</span>
+        </div>
+        <div class="sub">Annual Enrollment ends December 7</div>
+        <div class="btn" id="ctaBtn">Tap<b>LEARN MORE</b>below</div>
+        <div class="down" id="ctaDown">
+          <svg viewBox="0 0 48 48" fill="none" stroke="#5cb128" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M24 7V38M11 26L24 39L37 26"/></svg>
+        </div>
+        <div class="rchip" style="left: 246px; top: 1290px">
+          <i><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 25L20 34L37 14"/></svg></i>Takes about a minute
+        </div>
+        <div class="rchip" style="left: 232px; top: 1384px">
+          <i><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 25L20 34L37 14"/></svg></i>Free
+        </div>
+        <div class="rchip" style="left: 462px; top: 1384px">
+          <i><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"><path d="M11 25L20 34L37 14"/></svg></i>No obligation
+        </div>
+        <div class="call">Or call <b>800-324-9986</b></div>
+        <div class="disc">Allen &amp; Associates Insurance Agency is a non-government entity. Not all plans offer all benefits.</div>
+      </div>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      /* scene start times on the final timeline (10 s clips, 0.5 s pause between them) */
+      const T1 = 0, T2 = 10.5, T3 = 21;
+
+      /* ---------------- captions ----------------
+         words are [text, start(sec, local to clip), highlight?]; times from forced alignment
+         of the final Arric-voice audio. chunk end = last word end. */
+      const CAPS = [
+        [T1, [
+          [[["If", .57], ["you're", .68], ["already", .84]], 1.15],
+          [[["on", 1.16], ["Medicare,", 1.31]], 1.77],
+          [[["there's", 1.78], ["a", 1.99], ["deadline", 2.04, 1]], 2.48],
+          [[["coming", 2.49], ["up,", 2.78]], 3.07],
+          [[["and", 3.08], ["a", 3.24], ["lot", 3.27], ["of", 3.5]], 3.56],
+          [[["people", 3.57], ["miss", 3.82], ["it.", 4.09]], 4.27],
+          [[["Between", 4.86], ["October", 5.24], ["15th", 5.66]], 6.22],
+          [[["and", 6.23], ["December", 6.35, 1], ["7th,", 6.7, 1]], 7.15],
+          [[["you", 7.16], ["can", 7.34], ["review", 7.5]], 7.81],
+          [[["your", 7.82], ["plan", 7.94], ["and", 8.32]], 8.42],
+          [[["make", 8.43], ["changes", 8.6]], 9.02],
+          [[["for", 9.03], ["next", 9.14], ["year.", 9.43]], 9.7],
+        ]],
+        [T2, [
+          [[["Plans", 0.0], ["can", 0.45], ["change", 0.61]], 0.99],
+          [[["their", 1.0], ["costs,", 1.14]], 1.76],
+          [[["their", 1.77], ["doctors,", 2.02]], 2.76],
+          [[["and", 2.77], ["their", 3.02]], 3.11],
+          [[["prescription", 3.12], ["coverage", 3.69]], 4.23],
+          [[["every", 4.72], ["year.", 4.99]], 5.41],
+          [[["And", 5.8], ["after", 5.92]], 6.16],
+          [[["December", 6.17, 1], ["7th,", 6.55, 1]], 7.03],
+          [[["you're", 7.04], ["usually", 7.25]], 7.68],
+          [[["locked", 7.69], ["in", 8.05]], 8.61],
+          [[["until", 8.62], ["next", 8.91], ["year.", 9.22]], 9.51],
+        ]],
+        [T3, [
+          [[["The", 0.18], ["good", 0.25], ["news?", 0.47]], 0.88],
+          [[["A", 1.17], ["review", 1.22], ["is", 1.6], ["free,", 1.74, 1]], 2.1],
+          [[["and", 2.1], ["it", 2.34], ["takes", 2.53]], 2.77],
+          [[["just", 2.78], ["a", 3.0], ["few", 3.03], ["minutes.", 3.25]], 3.71],
+          [[["Tap", 4.14], ["the", 4.39], ["link", 4.45], ["below,", 4.68]], 5.1],
+          [[["answer", 5.34], ["a", 5.65], ["quick", 5.69], ["question,", 5.91]], 6.42],
+          [[["and", 6.43], ["one", 6.83], ["of", 7.0], ["our", 7.1]], 7.16],
+          [[["licensed", 7.17], ["agents", 7.38]], 7.59],
+          [[["will", 7.6], ["call", 7.72], ["you.", 7.96]], 8.23],
+          [[["No", 8.72, 1], ["obligation.", 8.97, 1]], 9.62],
+        ]],
+      ];
+
+      const capRoot = document.getElementById("captions");
+      CAPS.forEach(([t0, chunks]) => {
+        chunks.forEach(([words, end], ci) => {
+          const wrap = document.createElement("div");
+          wrap.className = "capwrap";
+          const pill = document.createElement("div");
+          pill.className = "cap";
+          const spans = words.map(([txt, st, hl]) => {
+            const s = document.createElement("span");
+            s.className = "w" + (hl ? " hl" : "");
+            s.textContent = txt;
+            pill.appendChild(s);
+            return [s, st];
+          });
+          wrap.appendChild(pill);
+          capRoot.appendChild(wrap);
+
+          const first = words[0][1];
+          const next = chunks[ci + 1] ? chunks[ci + 1][0][0][1] : Infinity;
+          const hide = Math.min(t0 + next - 0.04, t0 + end + 0.3);
+          tl.fromTo(wrap, { opacity: 0 }, { opacity: 1, duration: 0.14, ease: "power2.out" }, t0 + first - 0.02);
+          spans.forEach(([s, st]) => {
+            tl.fromTo(s, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.14, ease: "power2.out" }, t0 + st - 0.02);
+          });
+          tl.set(wrap, { opacity: 0 }, hide);
+        });
+      });
+
+      /* ---------------- scene fades (pause of 0.5 s between clips) ---------------- */
+      tl.set("#sc1", { opacity: 1 }, 0);
+      tl.to("#sc1", { opacity: 0, duration: 0.25, ease: "power1.inOut" }, T1 + 9.75);
+      tl.fromTo("#sc2", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.inOut" }, T2);
+      tl.to("#sc2", { opacity: 0, duration: 0.25, ease: "power1.inOut" }, T2 + 9.75);
+      tl.fromTo("#sc3", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.inOut" }, T3);
+      tl.to("#sc3", { opacity: 0, duration: 0.3, ease: "power1.inOut" }, T3 + 9.7);
+
+      /* ---------------- scene 1: push-in + calendar chip ---------------- */
+      tl.fromTo("#sc1", { scale: 1 }, { scale: 1.05, duration: 10, ease: "none", transformOrigin: "50% 38%" }, 0);
+      tl.fromTo("#cal", { opacity: 0, y: -26 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.5);
+      tl.to("#cal", { opacity: 0, duration: 0.4, ease: "power1.in" }, 9.4);
+
+      /* ---------------- scene 2: icon chips, then the reminder ---------------- */
+      [["#c2a", 1.1], ["#c2b", 2.0], ["#c2c", 3.1]].forEach(([id, t]) => {
+        tl.fromTo(id, { opacity: 0, y: 28, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power2.out" }, T2 + t);
+      });
+      tl.to("#chips2", { opacity: 0, duration: 0.4, ease: "power1.in" }, T2 + 5.1);
+      tl.set("#chips2", { display: "none" }, T2 + 5.55);
+      tl.set("#locked", { display: "flex" }, T2 + 5.8);
+      tl.set("#locked", { display: "none" }, T2 + 9.8);
+      tl.fromTo("#locked", { opacity: 0, y: 28 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, T2 + 5.8);
+      tl.to("#locked", { opacity: 0, duration: 0.4, ease: "power1.in" }, T2 + 9.35);
+
+      /* ---------------- scene 3: check chips, then the tap prompt ---------------- */
+      [["#c3a", 1.2], ["#c3b", 2.6], ["#c3c", 5.4]].forEach(([id, t]) => {
+        tl.fromTo(id, { opacity: 0, y: 28, scale: 0.94 }, { opacity: 1, y: 0, scale: 1, duration: 0.55, ease: "power2.out" }, T3 + t);
+      });
+      tl.to("#chips3", { opacity: 0, duration: 0.4, ease: "power1.in" }, T3 + 9.3);
+      tl.fromTo("#tap .txt", { opacity: 0, y: 22 }, { opacity: 1, y: 0, duration: 0.7, ease: "power2.out" }, T3 + 7.4);
+      tl.fromTo("#tapArrow", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, T3 + 7.7);
+      tl.fromTo("#tapArrow svg", { y: 0 }, { y: 7, duration: 0.7, ease: "sine.inOut", repeat: 3, yoyo: true }, T3 + 8.0);
+      tl.to("#tap", { opacity: 0, duration: 0.4, ease: "power1.in" }, T3 + 9.3);
+
+      /* ---------------- final card ---------------- */
+      tl.fromTo("#cta", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 31);
+      tl.fromTo("#ctaBtn", { scale: 1 }, { scale: 1.035, duration: 1.1, ease: "sine.inOut", repeat: 3, yoyo: true, transformOrigin: "50% 50%" }, 31.6);
+      tl.fromTo("#ctaDown", { y: 0 }, { y: 16, duration: 0.6, ease: "sine.inOut", repeat: 5, yoyo: true }, 31.6);
+
+      window.__timelines["main"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
