@@ -21,3 +21,8 @@ Voice has been converted to Arric Allen's cloned voice (ElevenLabs speech-to-spe
 - Format: 9:16 vertical. Keep the bottom fifth of the frame clear for captions and the ad's buttons.
 - Phone number to show: 800-324-9986. Disclaimer to show: Allen & Associates Insurance Agency is a non-government entity.
 - Do not imply any government affiliation. No obligation to enroll.
+
+## Video ad (rendered)
+- `Medicare_AEP_2026_Free_Plan_Review_Ad.mp4` - 1080x1920, 24 fps, 36 s (3 x 10 s clips with 0.5 s pauses, then a 5 s call-to-action card). Audio is taken straight from the three source clips.
+- `final_card_frame.png` - frame from the final card.
+- `ad/` - HyperFrames project. Run `ad/prepare.sh`, then `npx hyperframes check` and `npx hyperframes render -f 24 -q high` inside `ad/`.
