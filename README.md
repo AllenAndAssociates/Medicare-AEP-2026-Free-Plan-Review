@@ -12,6 +12,7 @@ Voice has been converted to Arric Allen's cloned voice (ElevenLabs speech-to-spe
 **Scene 3** - The good news? A review is free, and it takes just a few minutes. Tap the link below, answer a quick question, and one of our licensed agents will call you. No obligation.
 
 ## Files
+- logo.png (transparent PNG, 2170x725) - use for the opening and the final call-to-action card
 - Scene_1_1080p_20261005190117_ArricVoice.mp4
 - Scene_2_1080p_20261005191140_ArricVoice.mp4
 - Scene_3_1080p_20261005190105_ArricVoice.mp4
