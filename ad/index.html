@@ -50,7 +50,6 @@
         width: 1080px;
         height: 1920px;
         z-index: 1;
-        opacity: 0;
       }
       .scene video {
         position: absolute;
@@ -422,7 +421,7 @@
       id="root"
       data-composition-id="main"
       data-start="0"
-      data-duration="36"
+      data-duration="35"
       data-width="1080"
       data-height="1920"
     >
@@ -432,11 +431,11 @@
       </div>
       <!-- ============ SCENE 2 ============ -->
       <div class="scene" id="sc2">
-        <video id="v2" class="clip" src="assets/video/scene2.mp4" data-start="10.5" data-duration="10" data-track-index="0" data-has-audio="true" playsinline></video>
+        <video id="v2" class="clip" src="assets/video/scene2.mp4" data-start="10" data-duration="10" data-track-index="0" data-has-audio="true" playsinline></video>
       </div>
       <!-- ============ SCENE 3 ============ -->
       <div class="scene" id="sc3">
-        <video id="v3" class="clip" src="assets/video/scene3.mp4" data-start="21" data-duration="10" data-track-index="0" data-has-audio="true" playsinline></video>
+        <video id="v3" class="clip" src="assets/video/scene3.mp4" data-start="20" data-duration="10" data-track-index="0" data-has-audio="true" playsinline></video>
       </div>
 
       <!-- Scene 1 graphic -->
@@ -449,7 +448,7 @@
       </div>
 
       <!-- Scene 2 graphics -->
-      <div class="overlay clip" id="ov2" data-start="10.5" data-duration="10" data-track-index="1">
+      <div class="overlay clip" id="ov2" data-start="10" data-duration="10" data-track-index="1">
         <div class="chips" id="chips2">
           <div class="chip" id="c2a" style="left: 0">
             <div class="ico b">
@@ -476,7 +475,7 @@
       </div>
 
       <!-- Scene 3 graphics -->
-      <div class="overlay clip" id="ov3" data-start="21" data-duration="10" data-track-index="1">
+      <div class="overlay clip" id="ov3" data-start="20" data-duration="10" data-track-index="1">
         <div class="chips" id="chips3">
           <div class="chip" id="c3a" style="left: 0">
             <div class="ico g"><svg viewBox="0 0 48 48" fill="none" stroke="#fff" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><path d="M11 25L20 34L37 14"/></svg></div>
@@ -500,10 +499,10 @@
       </div>
 
       <!-- Captions (built from the data below) -->
-      <div id="captions" class="clip" data-start="0" data-duration="36" data-track-index="2"></div>
+      <div id="captions" class="clip" data-start="0" data-duration="35" data-track-index="2"></div>
 
       <!-- Final call-to-action card -->
-      <div id="cta" class="clip" data-start="31" data-duration="5" data-track-index="3">
+      <div id="cta" class="clip" data-start="29.75" data-duration="5.25" data-track-index="3">
         <div class="bar"></div>
         <div class="plate"><img src="assets/img/logo.png" alt="Allen &amp; Associates Insurance Agency — Making Medicare Easy" /></div>
         <div class="head">
@@ -533,8 +532,8 @@
     <script>
       const tl = gsap.timeline({ paused: true });
 
-      /* scene start times on the final timeline (10 s clips, 0.5 s pause between them) */
-      const T1 = 0, T2 = 10.5, T3 = 21;
+      /* scene start times on the final timeline (10 s clips, hard cuts; the pauses are the natural silences at the clip edges) */
+      const T1 = 0, T2 = 10, T3 = 20;
 
       /* ---------------- captions ----------------
          words are [text, start(sec, local to clip), highlight?]; times from forced alignment
@@ -600,7 +599,7 @@
 
           const first = words[0][1];
           const next = chunks[ci + 1] ? chunks[ci + 1][0][0][1] : Infinity;
-          const hide = Math.min(t0 + next - 0.04, t0 + end + 0.3);
+          const hide = Math.min(t0 + next - 0.04, t0 + end + 0.3, 29.72);
           tl.fromTo(wrap, { opacity: 0 }, { opacity: 1, duration: 0.14, ease: "power2.out" }, t0 + first - 0.02);
           spans.forEach(([s, st]) => {
             tl.fromTo(s, { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.14, ease: "power2.out" }, t0 + st - 0.02);
@@ -609,16 +608,13 @@
         });
       });
 
-      /* ---------------- scene fades (pause of 0.5 s between clips) ---------------- */
-      tl.set("#sc1", { opacity: 1 }, 0);
-      tl.to("#sc1", { opacity: 0, duration: 0.25, ease: "power1.inOut" }, T1 + 9.75);
-      tl.fromTo("#sc2", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.inOut" }, T2);
-      tl.to("#sc2", { opacity: 0, duration: 0.25, ease: "power1.inOut" }, T2 + 9.75);
-      tl.fromTo("#sc3", { opacity: 0 }, { opacity: 1, duration: 0.25, ease: "power1.inOut" }, T3);
-      tl.to("#sc3", { opacity: 0, duration: 0.3, ease: "power1.inOut" }, T3 + 9.7);
-
-      /* ---------------- scene 1: push-in + calendar chip ---------------- */
+      /* ---------------- hard cuts with alternating framing ----------------
+         S1 wide with a slow 5% push-in -> cut to a tighter crop (S2) -> cut back to wide (S3) */
       tl.fromTo("#sc1", { scale: 1 }, { scale: 1.05, duration: 10, ease: "none", transformOrigin: "50% 38%" }, 0);
+      tl.fromTo("#sc2", { scale: 1.14 }, { scale: 1.16, duration: 10, ease: "none", transformOrigin: "50% 20%" }, T2);
+      tl.fromTo("#sc3", { scale: 1 }, { scale: 1.03, duration: 10, ease: "none", transformOrigin: "50% 38%" }, T3);
+
+      /* ---------------- scene 1: calendar chip ---------------- */
       tl.fromTo("#cal", { opacity: 0, y: -26 }, { opacity: 1, y: 0, duration: 0.8, ease: "power2.out" }, 0.5);
       tl.to("#cal", { opacity: 0, duration: 0.4, ease: "power1.in" }, 9.4);
 
@@ -644,9 +640,9 @@
       tl.to("#tap", { opacity: 0, duration: 0.4, ease: "power1.in" }, T3 + 9.3);
 
       /* ---------------- final card ---------------- */
-      tl.fromTo("#cta", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 31);
-      tl.fromTo("#ctaBtn", { scale: 1 }, { scale: 1.035, duration: 1.1, ease: "sine.inOut", repeat: 3, yoyo: true, transformOrigin: "50% 50%" }, 31.6);
-      tl.fromTo("#ctaDown", { y: 0 }, { y: 16, duration: 0.6, ease: "sine.inOut", repeat: 5, yoyo: true }, 31.6);
+      tl.fromTo("#cta", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power1.out" }, 29.75);
+      tl.fromTo("#ctaBtn", { scale: 1 }, { scale: 1.035, duration: 1.1, ease: "sine.inOut", repeat: 3, yoyo: true, transformOrigin: "50% 50%" }, 30.6);
+      tl.fromTo("#ctaDown", { y: 0 }, { y: 16, duration: 0.6, ease: "sine.inOut", repeat: 5, yoyo: true }, 30.6);
 
       window.__timelines["main"] = tl;
       tl.seek(0);
